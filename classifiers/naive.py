@@ -19,12 +19,13 @@ class NaiveBayesClassifier(BaseClassifier):
     def __init__(self, alpha=1.0):
         self.alpha = alpha
 
+    def initiate_priors(self):
         self.labels = defaultdict(lambda: 0)
         self.labelsfeatures = defaultdict(lambda: 0)
         self.feature_counts = defaultdict(lambda: defaultdict(lambda: 0))
 
     def fit(self, X_train, y_train):
-
+        self.initiate_priors()
         for i in xrange(len(y_train)):
             label = y_train[i]
             self.labels[label] += 1
@@ -33,8 +34,7 @@ class NaiveBayesClassifier(BaseClassifier):
             for j in xrange(len(features)):
                 self.feature_counts[label][j] += X_train[i, j]
             self.labelsfeatures[label] += len(X_train[i])
-        print self.labels
-        print self.labelsfeatures
+        self.vocabulary_size = X_train.shape[1]
 
     def predict(self, X):
         prediction = [self.predict_one(row) for row in X]
@@ -64,13 +64,6 @@ class NaiveBayesClassifier(BaseClassifier):
         else:
             raise KeyError
 
-    def get_vocabulary_size(self):
-        feature_set = set()
-        for label in self.feature_counts:
-            for feature in self.feature_counts[label]:
-                feature_set.add(feature)
-        self.vocabulary_size = len(feature_set)
-
     def get_probability(self, feature, label):
         key, value = feature
         if label in self.labels:
@@ -91,33 +84,3 @@ class NaiveBayesClassifier(BaseClassifier):
         else:
             print "Given label doesn't exist"
             raise KeyError
-
-if __name__ == '__main__':
-
-    X, y = make_blobs(n_samples=1500, centers=5, n_features=20, center_box= (5.0, 10.0))
-    X_train, X_test = X[:1000], X[1000:]
-    y_train, y_test = y[:1000], y[1000:]
-
-
-    # plt.scatter(X[:, 0], X[:, 1], marker='o', c=y)
-    # plt.show()
-
-    nb = NaiveBayesClassifier(0.1)
-    print('Fitting...')
-    nb.fit(X_train, y_train)
-    print('Fitted!')
-    nb.get_vocabulary_size()
-    res = nb.predict(X_test)
-    print('Done!')
-
-    from sklearn.metrics import f1_score
-
-    print f1_score(y_test, res, average='macro')
-
-
-    from sklearn.naive_bayes import MultinomialNB
-
-    mnb = MultinomialNB(alpha=0.1)
-    mnb.fit(X_train, y_train)
-    m_res = mnb.predict(X_test)
-    print f1_score(y_test, m_res, average='micro')
