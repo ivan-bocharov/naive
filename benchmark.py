@@ -1,19 +1,25 @@
 # encoding=utf-8
 #author: Bocharov Ivan
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 from classifiers.naive import NaiveBayesClassifier
+
 from sklearn.datasets import make_blobs
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import precision_score, f1_score, recall_score
+from collections import Counter, OrderedDict
 
 
 class Benchmark(object):
 
-    def __init__(self, plot=True):
+    def __init__(self, plot=True, average='macro'):
         self.plot = plot
+        self.average = average
 
-    def generate_dataset(self, n_classes=2, n_samples=300, n_features=5, center_box=(5.0, 10.0), cluster_std=1.0):
-        return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
+    # def generate_dataset(self, n_classes=5, n_samples=300, n_features=5, center_box=(5.0, 10.0), cluster_std=1.0):
+    #     return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
 
     def classifier_performance(self, classifier, dataset, n_folds=10, shuffle=True):
         _, target = dataset
@@ -42,26 +48,32 @@ class Benchmark(object):
         classifier.fit(X_train, y_train)
         y_predicted = classifier.predict(X_test)
 
-        precision, recall, f1 = precision_score(y_test, y_predicted),\
-            recall_score(y_test, y_predicted), f1_score(y_test, y_predicted)
+        n_classes = len(Counter(y_train))
+
+        average = 'binary' if n_classes == 2 else self.average
+
+        precision, recall, f1 = precision_score(y_test, y_predicted, average=average),\
+            recall_score(y_test, y_predicted, average=average), f1_score(y_test, y_predicted, average=average)
 
         return precision, recall, f1
 
-    def alpha_experiment(self):
+    def alpha_experiment(self, dataset):
+        results = OrderedDict()
         for i in xrange(10):
-            dataset = self.generate_dataset()
             alpha = (i+1) * 0.1
             precision, recall, f1 = self.classifier_performance(NaiveBayesClassifier(alpha), dataset)
-            print precision, recall, f1
+            results[alpha] = (precision, recall, f1)
+        if self.plot:
+            self.plot_results(results)
+        return results
 
     def build_classifiers(self):
         classifiers = [NaiveBayesClassifier(alpha=0.3)]
         return classifiers
 
-    def benchmark_experiment(self):
+    def benchmark_experiment(self, dataset):
         classifiers = self.build_classifiers()
 
-        dataset= self.generate_dataset()
         data, target = dataset
         n_folds = 10
         cv = StratifiedKFold(target, n_folds)
@@ -80,3 +92,16 @@ class Benchmark(object):
 
         return average_precision, average_recall, average_f1
             #add to the plot
+
+    def plot_results(self, results):
+
+        ind = np.arange(len(results))  # the x locations for the groups
+        width = 0.25       # the width of the bars
+
+        fig, ax = plt.subplots()
+        precisions = ax.bar(ind, [result[0] for result in results.itervalues()], width, color='r')
+        recalls = ax.bar(ind+width, [result[1] for result in results.itervalues()], width, color='g')
+        f1 = ax.bar(ind+2*width, [result[2] for result in results.itervalues()], width, color='b')
+
+        ax.legend( (precisions, recalls, f1), ('Precision', 'Recall', 'F1') )
+        plt.show()

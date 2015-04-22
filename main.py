@@ -4,6 +4,7 @@
 import matplotlib.pyplot as plt
 
 from argparse import ArgumentParser
+from sklearn.datasets import make_blobs
 
 from benchmark import Benchmark
 
@@ -14,11 +15,15 @@ def add_arguments(argument_parser):
     argument_parser.add_argument('-t')
 
 
+def generate_dataset(n_classes=2, n_samples=300, n_features=5, center_box=(5.0, 10.0), cluster_std=1.0):
+        return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
+
+
 if __name__ == '__main__':
     benchmark = Benchmark()
     add_arguments(argument_parser)
     argument_parser.parse_args()
     #TODO:Add options and stuff
-    print benchmark.benchmark_experiment()
+    benchmark.alpha_experiment(generate_dataset())
 
 
