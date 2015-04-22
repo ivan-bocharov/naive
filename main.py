@@ -15,7 +15,7 @@ def add_arguments(argument_parser):
     argument_parser.add_argument('-t')
 
 
-def generate_dataset(n_classes=2, n_samples=300, n_features=5, center_box=(5.0, 10.0), cluster_std=1.0):
+def generate_dataset(n_classes=5, n_samples=300, n_features=100, center_box=(5.0, 10.0), cluster_std=3.0):
         return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
 
 
@@ -25,5 +25,6 @@ if __name__ == '__main__':
     argument_parser.parse_args()
     #TODO:Add options and stuff
     benchmark.alpha_experiment(generate_dataset())
+    benchmark.benchmark_experiment(generate_dataset())
 
 

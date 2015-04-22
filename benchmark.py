@@ -9,6 +9,7 @@ from classifiers.naive import NaiveBayesClassifier
 from sklearn.datasets import make_blobs
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import precision_score, f1_score, recall_score
+from sklearn.neighbors.classification import KNeighborsClassifier
 from collections import Counter, OrderedDict
 
 
@@ -17,9 +18,6 @@ class Benchmark(object):
     def __init__(self, plot=True, average='macro'):
         self.plot = plot
         self.average = average
-
-    # def generate_dataset(self, n_classes=5, n_samples=300, n_features=5, center_box=(5.0, 10.0), cluster_std=1.0):
-    #     return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
 
     def classifier_performance(self, classifier, dataset, n_folds=10, shuffle=True):
         _, target = dataset
@@ -64,11 +62,14 @@ class Benchmark(object):
             precision, recall, f1 = self.classifier_performance(NaiveBayesClassifier(alpha), dataset)
             results[alpha] = (precision, recall, f1)
         if self.plot:
-            self.plot_results(results)
+            self.plot_alpha_results(results)
         return results
 
     def build_classifiers(self):
-        classifiers = [NaiveBayesClassifier(alpha=0.3)]
+        classifiers = [
+            ("NaiveBayes", NaiveBayesClassifier(alpha=0.3)),
+            ("kNN", KNeighborsClassifier())
+        ]
         return classifiers
 
     def benchmark_experiment(self, dataset):
@@ -78,11 +79,9 @@ class Benchmark(object):
         n_folds = 10
         cv = StratifiedKFold(target, n_folds)
 
-        average_precision = 0.0
-        average_recall = 0.0
-        average_f1 = 0.0
-
-        for classifier in classifiers:
+        results = OrderedDict()
+        for classifier_name, classifier in classifiers:
+            average_precision, average_recall, average_f1 = 0.0, 0.0, 0.0
             for fold in cv:
                 precision, recall, f1 = self.performance_on_current_fold(classifier, dataset, fold)
                 print precision, recall, f1
@@ -90,18 +89,33 @@ class Benchmark(object):
                 average_recall += recall/n_folds
                 average_f1 += f1/n_folds
 
-        return average_precision, average_recall, average_f1
-            #add to the plot
+            results[classifier_name] = (average_precision, average_recall, average_f1)
 
-    def plot_results(self, results):
+        if self.plot:
+            self.plot_benchmark_results(results)
 
-        ind = np.arange(len(results))  # the x locations for the groups
-        width = 0.25       # the width of the bars
+    def plot_alpha_results(self, results):
+
+        ind = np.arange(len(results))
+        width = 0.25
 
         fig, ax = plt.subplots()
         precisions = ax.bar(ind, [result[0] for result in results.itervalues()], width, color='r')
         recalls = ax.bar(ind+width, [result[1] for result in results.itervalues()], width, color='g')
         f1 = ax.bar(ind+2*width, [result[2] for result in results.itervalues()], width, color='b')
 
-        ax.legend( (precisions, recalls, f1), ('Precision', 'Recall', 'F1') )
+        ax.legend((precisions, recalls, f1), ('Precision', 'Recall', 'F1'))
+        plt.show()
+
+    def plot_benchmark_results(self, results):
+        ind = np.arange(len(results))  # the x locations for the groups
+        width = 0.25       # the width of the bars
+
+        fig, ax = plt.subplots()
+
+        precisions = ax.bar(ind, [result[0] for result in results.itervalues()], width, color='r')
+        recalls = ax.bar(ind+width, [result[1] for result in results.itervalues()], width, color='g')
+        f1 = ax.bar(ind+2*width, [result[2] for result in results.itervalues()], width, color='b')
+
+        ax.legend((precisions, recalls, f1), ('Precision', 'Recall', 'F1'))
         plt.show()
