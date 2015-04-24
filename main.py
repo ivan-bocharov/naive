@@ -16,6 +16,14 @@ def add_arguments(argument_parser):
 
 
 def generate_dataset(n_classes=5, n_samples=300, n_features=100, center_box=(5.0, 10.0), cluster_std=3.0):
+        print '''
+Dataset parameters:
+    Number of classes: {}
+    Number of samples: {}
+    Number of features: {}
+    The box of centers of classes: {}
+    Standard deviation of class elements: {}
+'''.format(n_classes, n_samples, n_features, center_box, cluster_std)
         return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
 
 

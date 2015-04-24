@@ -6,7 +6,6 @@ import numpy as np
 
 from classifiers.naive import NaiveBayesClassifier
 
-from sklearn.datasets import make_blobs
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import precision_score, f1_score, recall_score
 from sklearn.neighbors.classification import KNeighborsClassifier
@@ -104,7 +103,13 @@ class Benchmark(object):
         recalls = ax.bar(ind+width, [result[1] for result in results.itervalues()], width, color='g')
         f1 = ax.bar(ind+2*width, [result[2] for result in results.itervalues()], width, color='b')
 
-        ax.legend((precisions, recalls, f1), ('Precision', 'Recall', 'F1'))
+        ax.legend((precisions, recalls, f1), ('Precision', 'Recall', 'F1'), loc='lower right')
+        min_on_display = min(min(results.values()))
+        plt.ylim([min_on_display-0.1, 1.0])
+        ax.set_xticks(ind+(1.5*width))
+        ax.set_xticklabels( [0.1*i for i in xrange(1, 11)] )
+        plt.title("Naive Bayes classifier performance")
+        plt.xlabel("Alpha (regularization parameter)")
         plt.show()
 
     def plot_benchmark_results(self, results):
@@ -117,5 +122,10 @@ class Benchmark(object):
         recalls = ax.bar(ind+width, [result[1] for result in results.itervalues()], width, color='g')
         f1 = ax.bar(ind+2*width, [result[2] for result in results.itervalues()], width, color='b')
 
-        ax.legend((precisions, recalls, f1), ('Precision', 'Recall', 'F1'))
+        ax.legend((precisions, recalls, f1), ('Precision', 'Recall', 'F1'), loc='lower right')
+        min_on_display = min(min(results.values()))
+        plt.ylim([min_on_display-0.1, 1.0])
+        ax.set_xticks(ind+(1.5*width))
+        ax.set_xticklabels( [c for c in results.iterkeys()] )
+        plt.title("Various classifiers' performance")
         plt.show()
