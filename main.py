@@ -15,7 +15,7 @@ def add_arguments(argument_parser):
     argument_parser.add_argument('-c', dest='classes', help="Classes number", default=2, type=int)
     argument_parser.add_argument('-s', dest='samples', help="Samples number", default=300, type=int)
     argument_parser.add_argument('-f', dest='features', help="Features number", default=100, type=int)
-    argument_parser.add_argument('-box', dest='box', action='store', nargs='*',  help="The box of centers of classes", default=(5.0, 10.0), type=tuple)
+    argument_parser.add_argument('-box', dest='box', action='store', nargs='*',  help="The box of centers of classes", default=(5.0, 10.0), type=str)
     argument_parser.add_argument('-std', dest='std', help="Standard deviation of class elements distribution", default=3.0, type=float)
     argument_parser.add_argument('-a', dest='average', help="Averaging method", default='macro', type=str)
     argument_parser.add_argument('--logging', dest='log', help="Logging enabling", nargs='?', const=1)
@@ -40,8 +40,8 @@ if __name__ == '__main__':
     n_classes, n_samples, n_features, cluster_std = args.classes,\
     args.samples, args.features, args.std
     try:
-        center_box = tuple(args.box)
-    except:
+        center_box = tuple(float(coord) for coord in args.box)
+    except ValueError:
         center_box = (5.0, 10.0)
 
     dataset = generate_dataset(n_classes, n_samples, n_features, center_box, cluster_std)
