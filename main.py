@@ -17,6 +17,7 @@ def add_arguments(argument_parser):
     argument_parser.add_argument('-f', dest='features', help="Features number", default=100, type=int)
     argument_parser.add_argument('-box', dest='box', help="The box of centers of classes", default=(5.0, 10.0), type=tuple)
     argument_parser.add_argument('-std', dest='std', help="Standard deviation of class elements distribution", default=3.0, type=float)
+    argument_parser.add_argument('-a', dest='average', help="Averaging method", default='macro', type=str)
     argument_parser.add_argument('--logging', dest='log', help="Logging enabling")
     argument_parser.add_argument('--plot', dest='plot', help="Plotting enabling")
 
@@ -35,7 +36,7 @@ def generate_dataset(n_classes=5, n_samples=300, n_features=100, center_box=(5.0
 if __name__ == '__main__':
     add_arguments(argument_parser)
     args = argument_parser.parse_args()
-    benchmark = Benchmark(plot=args.plot, logging=args.log)
+    benchmark = Benchmark(plot=args.plot, logging=args.log, average=args.average)
     n_classes, n_samples, n_features, center_box, cluster_std = args.classes,\
     args.samples, args.features, args.box, args.std
     dataset = generate_dataset(n_classes, n_samples, n_features, center_box, cluster_std)
