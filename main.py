@@ -12,27 +12,34 @@ argument_parser = ArgumentParser(description="The demonstration of Naive Bayes c
 
 
 def add_arguments(argument_parser):
-    argument_parser.add_argument('-t')
+    argument_parser.add_argument('-c', dest='classes', help="Classes number", default=2, type=int)
+    argument_parser.add_argument('-s', dest='samples', help="Samples number", default=300, type=int)
+    argument_parser.add_argument('-f', dest='features', help="Features number", default=100, type=int)
+    argument_parser.add_argument('-box', dest='box', help="The box of centers of classes", default=(5.0, 10.0), type=tuple)
+    argument_parser.add_argument('-std', dest='std', help="Standard deviation of class elements distribution", default=3.0, type=float)
+    argument_parser.add_argument('--logging', dest='log', help="Logging enabling")
+    argument_parser.add_argument('--plot', dest='plot', help="Plotting enabling")
 
 
 def generate_dataset(n_classes=5, n_samples=300, n_features=100, center_box=(5.0, 10.0), cluster_std=3.0):
-        print '''
-Dataset parameters:
+    print '''Dataset parameters:
     Number of classes: {}
     Number of samples: {}
     Number of features: {}
     The box of centers of classes: {}
     Standard deviation of class elements: {}
 '''.format(n_classes, n_samples, n_features, center_box, cluster_std)
-        return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
+    return make_blobs(n_samples, n_features, n_classes, center_box=center_box, cluster_std=cluster_std)
 
 
 if __name__ == '__main__':
-    benchmark = Benchmark()
     add_arguments(argument_parser)
-    argument_parser.parse_args()
-    #TODO:Add options and stuff
-    benchmark.alpha_experiment(generate_dataset())
-    benchmark.benchmark_experiment(generate_dataset())
+    args = argument_parser.parse_args()
+    benchmark = Benchmark(plot=args.plot, logging=args.log)
+    n_classes, n_samples, n_features, center_box, cluster_std = args.classes,\
+    args.samples, args.features, args.box, args.std
+    dataset = generate_dataset(n_classes, n_samples, n_features, center_box, cluster_std)
+    benchmark.alpha_experiment(dataset)
+    benchmark.benchmark_experiment(dataset)
 
 

@@ -14,9 +14,10 @@ from collections import Counter, OrderedDict
 
 class Benchmark(object):
 
-    def __init__(self, plot=True, average='macro'):
+    def __init__(self, plot=True, average='macro', logging=True):
         self.plot = plot
         self.average = average
+        self.logging = logging
 
     def classifier_performance(self, classifier, dataset, n_folds=10, shuffle=True):
         _, target = dataset
@@ -28,10 +29,11 @@ class Benchmark(object):
 
         for fold in cv:
             precision, recall, f1 = self.performance_on_current_fold(classifier, dataset, fold)
-
             average_precision += precision/n_folds
             average_recall += recall/n_folds
             average_f1 += f1/n_folds
+            if self.logging:
+                "Performance of classifier on current fold: P={} R={} F1={}".format(precision, recall, f1)
 
         return average_precision, average_recall, average_f1
 
@@ -51,15 +53,27 @@ class Benchmark(object):
 
         precision, recall, f1 = precision_score(y_test, y_predicted, average=average),\
             recall_score(y_test, y_predicted, average=average), f1_score(y_test, y_predicted, average=average)
-
+        if self.logging:
+                print "Performance of classifier on current fold: P={} R={} F1={}".format(precision, recall, f1)
         return precision, recall, f1
 
     def alpha_experiment(self, dataset):
+        if self.logging:
+            print "Running an experiment for Naive Bayes alpha parameter..."
+            print "="*80
         results = OrderedDict()
         for i in xrange(10):
             alpha = (i+1) * 0.1
+
             precision, recall, f1 = self.classifier_performance(NaiveBayesClassifier(alpha), dataset)
+            if self.logging:
+                print "Performance of classifier when alpha={}: P={} R={} F1={}".format(alpha, precision, recall, f1)
+
             results[alpha] = (precision, recall, f1)
+        if self.logging:
+            print "Finished!"
+            print "="*80
+
         if self.plot:
             self.plot_alpha_results(results)
         return results
@@ -72,22 +86,29 @@ class Benchmark(object):
         return classifiers
 
     def benchmark_experiment(self, dataset):
+        if self.logging:
+            print "Running classifier benchmark experiment..."
+
         classifiers = self.build_classifiers()
 
         data, target = dataset
         n_folds = 10
         cv = StratifiedKFold(target, n_folds)
-
         results = OrderedDict()
         for classifier_name, classifier in classifiers:
             average_precision, average_recall, average_f1 = 0.0, 0.0, 0.0
+            if self.logging:
+                print "="*80
+                print "Running CV for classifier {}...".format(classifier_name)
             for fold in cv:
                 precision, recall, f1 = self.performance_on_current_fold(classifier, dataset, fold)
-                print precision, recall, f1
+                if self.logging:
+                    print "Performance of classifier on current fold: P={} R={} F1={}".format(precision, recall, f1)
                 average_precision += precision/n_folds
                 average_recall += recall/n_folds
                 average_f1 += f1/n_folds
-
+            if self.logging:
+                print "="*80
             results[classifier_name] = (average_precision, average_recall, average_f1)
 
         if self.plot:
