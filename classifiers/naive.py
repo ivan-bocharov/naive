@@ -59,7 +59,7 @@ class NaiveBayesClassifier(BaseClassifier):
         else:
             raise KeyError
 
-    def get_probability(self, feature, label):
+    def get_feature_probability(self, feature, label):
         key, value = feature
         if label in self.total_documents_in_label:
             return (self.feature_count(key, label)+self.alpha)/(self.total_features_in_label[label]+self.vocabulary_size*self.alpha)
@@ -70,7 +70,7 @@ class NaiveBayesClassifier(BaseClassifier):
     def object_probability(self, classification_object, label):
         probability = 0.0
         for feature in xrange(len(classification_object)):
-            probability += classification_object[feature]*log(self.get_probability(
+            probability += classification_object[feature]*log(self.get_feature_probability(
                 (feature, classification_object[feature]), label))
         return probability
 

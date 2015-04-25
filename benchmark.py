@@ -9,6 +9,8 @@ from classifiers.naive import NaiveBayesClassifier
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import precision_score, f1_score, recall_score
 from sklearn.neighbors.classification import KNeighborsClassifier
+from sklearn.svm import LinearSVC
+from sklearn.linear_model.logistic import LogisticRegression
 from collections import Counter, OrderedDict
 
 
@@ -81,7 +83,9 @@ class Benchmark(object):
     def build_classifiers(self):
         classifiers = [
             ("NaiveBayes", NaiveBayesClassifier(alpha=0.3)),
-            ("kNN", KNeighborsClassifier())
+            ("kNN", KNeighborsClassifier()),
+            ("Linear SVM", LinearSVC()),
+            ("Logistic\nRegression", LogisticRegression())
         ]
         return classifiers
 
@@ -153,6 +157,6 @@ class Benchmark(object):
         min_on_display = min(min(results.values()))
         plt.ylim([min_on_display-0.1, 1.0])
         ax.set_xticks(ind+(1.5*width))
-        ax.set_xticklabels( [c for c in results.iterkeys()] )
+        ax.set_xticklabels([c for c in results.iterkeys()])
         plt.title("Various classifiers' performance")
         plt.show()
