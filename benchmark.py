@@ -32,8 +32,6 @@ class Benchmark(object):
             average_precision += precision/n_folds
             average_recall += recall/n_folds
             average_f1 += f1/n_folds
-            if self.logging:
-                "Performance of classifier on current fold: P={} R={} F1={}".format(precision, recall, f1)
 
         return average_precision, average_recall, average_f1
 
@@ -67,9 +65,11 @@ class Benchmark(object):
 
             precision, recall, f1 = self.classifier_performance(NaiveBayesClassifier(alpha), dataset)
             if self.logging:
+                print "-"*80
                 print "Performance of classifier when alpha={}: P={} R={} F1={}".format(alpha, precision, recall, f1)
 
             results[alpha] = (precision, recall, f1)
+            print "-"*80
         if self.logging:
             print "Finished!"
             print "="*80
@@ -100,6 +100,7 @@ class Benchmark(object):
             if self.logging:
                 print "="*80
                 print "Running CV for classifier {}...".format(classifier_name)
+                print "-"*80
             for fold in cv:
                 precision, recall, f1 = self.performance_on_current_fold(classifier, dataset, fold)
                 if self.logging:
@@ -108,6 +109,11 @@ class Benchmark(object):
                 average_recall += recall/n_folds
                 average_f1 += f1/n_folds
             if self.logging:
+                print "-"*80
+                print "Average performance of classifier {}: P={} R={} F1={}".format(classifier_name,
+                                                                                     average_precision,
+                                                                                     average_recall,
+                                                                                     average_f1)
                 print "="*80
             results[classifier_name] = (average_precision, average_recall, average_f1)
 
