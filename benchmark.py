@@ -4,14 +4,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from classifiers.naive import NaiveBayesClassifier
-
 from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import precision_score, f1_score, recall_score
 from sklearn.neighbors.classification import KNeighborsClassifier
 from sklearn.svm import LinearSVC
 from sklearn.linear_model.logistic import LogisticRegression
 from collections import Counter, OrderedDict
+
+from classifiers.naive import NaiveBayesClassifier
 
 
 class Benchmark(object):

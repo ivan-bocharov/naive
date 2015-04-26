@@ -1,8 +1,6 @@
 # encoding=utf-8
 #author: Bocharov Ivan
 
-import matplotlib.pyplot as plt
-
 from argparse import ArgumentParser
 from sklearn.datasets import make_blobs
 
