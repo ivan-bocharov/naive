@@ -1,4 +1,4 @@
-Some experiments with Naive Bayes classifier implemented in Python.
+###Some experiments with Naive Bayes classifier implemented in Python.
 
 In order to install all the requirements, run:
 ```
@@ -6,26 +6,27 @@ pip install -r requirements.txt
 ```
 from the root folder of the repository.
 
-Usage example:
+####Usage example:
 ```
 python main.py -c 5 -std 5.0 --plot --logging
 ```
 
-All the command line arguments:
--c Classes number, integer
+####All the command line arguments:
 
--s Samples number, integer
+**-c** Classes number, integer
 
--f Features number, integer
+**-s** Samples number, integer
 
--box The box of centers of classes, string (a list of numbers, separated with spaces. Example: 1 2 3 4)
+**-f** Features number, integer
 
--std Standard deviation of class elements distribution, floating point number
+**-box** The box of centers of classes, string (a list of numbers, separated with spaces. Example: 1 2 3 4)
 
--a Averaging method, string (possible variants are micro, macro and binary)
+**-std** Standard deviation of class elements distribution, floating point number
 
---logging Logging enabling
+**-a** Averaging method, string (possible variants are micro, macro and binary)
 
---plot Plotting enabling
+**--logging** Logging enabling
+
+**--plot** Plotting enabling
 
 Help is accessible via -h (or --help) argument.
